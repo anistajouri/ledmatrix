@@ -216,13 +216,13 @@ im.paste(origIm.crop((0,0,MATRIX_WIDTH,MATRIX_HEIGHT)),(origIm.size[0],0,origIm.
 
 # Main program logic follows:
 if __name__ == '__main__':
-        # Process arguments
-        opt_parse()
+    # Process arguments
+    opt_parse()
 
-	# Create NeoPixel object with appropriate configuration.
-	strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
-	# Intialize the library (must be called once before other functions).
-	strip.begin()
+    # Create NeoPixel object with appropriate configuration.
+    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
+    # Intialize the library (must be called once before other functions).
+    strip.begin()
     # And here we go.
     try:
       while(True):
