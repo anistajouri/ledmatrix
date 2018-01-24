@@ -155,6 +155,12 @@ def theaterChaseRainbow(strip, wait_ms=50):
       for i in range(0, strip.numPixels(), 3):
         strip.setPixelColor(i+q, 0)
 
+
+
+MATRIX_WIDTH=32
+MATRIX_HEIGHT=8
+
+
 # Main program logic follows:
 if __name__ == '__main__':
   # Process arguments
@@ -177,6 +183,39 @@ if __name__ == '__main__':
   lines = int(text_height * 0.75)
 
 
+  # Open the image file given as the command line parameter
+  try:
+    loadIm=Image.open(sys.argv[1])
+  except:
+    if len(sys.argv)==0:
+      raise Exception("Please provide an image filename as a parameter.")
+    else:
+      raise Exception("Image file %s could not be loaded" % sys.argv[1])
+
+  # If the image height doesn't match the matrix, resize it
+  if loadIm.size[1] != MATRIX_HEIGHT:
+    origIm=loadIm.resize((loadIm.size[0]/(loadIm.size[1]//MATRIX_HEIGHT),MATRIX_HEIGHT),Image.BICUBIC)
+  else:
+    origIm=loadIm.copy()
+  # If the input is a very small portrait image, then no amount of resizing will save us
+  if origIm.size[0] < MATRIX_WIDTH:
+    raise Exception("Picture is too narrow. Must be at least %s pixels wide" % MATRIX_WIDTH)        
+
+  # Add a copy of the start of the image, to the end of the image,
+  # so that it loops smoothly at the end of the image
+  im=Image.new('RGB',(origIm.size[0]+MATRIX_WIDTH,MATRIX_HEIGHT))
+  im.paste(origIm,(0,0,origIm.size[0],MATRIX_HEIGHT))
+  im.paste(origIm.crop((0,0,MATRIX_WIDTH,MATRIX_HEIGHT)),(origIm.size[0],0,origIm.size[0]+MATRIX_WIDTH,MATRIX_HEIGHT))
+
+
+#    rg=im.crop((x,0,x+MATRIX_WIDTH,MATRIX_HEIGHT))
+  rg=im.crop((0,0,MATRIX_WIDTH,MATRIX_HEIGHT))
+  dots=list(im.getdata())
+  # print("--------------------------")
+  # print(rg)
+  # print(dots)
+
+
   # add some padding to the text
 #  padding = ' ' * int(cols / space_width + 1)
 #  text = padding + text
@@ -190,8 +229,15 @@ if __name__ == '__main__':
 
   print ('Press Ctrl-C to quit.')
   while True:
-    print ('matrix scrolling.')
-    text_to_screen(font, text, cols, lines)
+    print ('hellworld.')
+    for x in range(MATRIX_WIDTH):
+      for y in range(MATRIX_HEIGHT):      
+        for i in range(len(dots)):
+           strip.setPixelColor(my_screen[x][y],colourTuple(dots[i]))
+    strip.show()
+
+
+#    text_to_screen(font, text, cols, lines)
     # colorWipe(strip, Color(255, 0, 0))  # Red wipe
     # colorWipe(strip, Color(0, 255, 0))  # Blue wipe
     # colorWipe(strip, Color(0, 0, 255))  # Green wipe
