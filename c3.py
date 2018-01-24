@@ -10,6 +10,38 @@ from neopixel import *
 import argparse
 import signal
 import sys
+
+def chunks(l, n):
+    return [l[i:i+n] for i in range(0, len(l), n)]
+
+
+def colourTuple(rgbTuple):
+    return Color(rgbTuple[1],rgbTuple[0],rgbTuple[2])
+
+def get_screen():
+  screen = [0] * 256
+  a = 0
+  for x in xrange(0,256,16):
+      s = ""
+      for i in range(x+0,x+8):
+        s += str(i) +","
+
+        screen[a] = i
+        a = a + 1
+      print(s)
+
+
+      x = x + 8
+      s = ""
+      for i in reversed(range(x+0,x+8)):
+        s += str(i) +","
+        screen[a] = i
+        a = a + 1      
+      print(s)
+
+  return chunks(screen,8)
+
+
 def signal_handler(signal, frame):
         colorWipe(strip, Color(0,0,0))
         sys.exit(0)
@@ -89,10 +121,43 @@ def theaterChaseRainbow(strip, wait_ms=50):
 			for i in range(0, strip.numPixels(), 3):
 				strip.setPixelColor(i+q, 0)
 
+
+
+MATRIX_WIDTH=32
+MATRIX_HEIGHT=8
+
+
 # Main program logic follows:
 if __name__ == '__main__':
         # Process arguments
         opt_parse()
+
+
+    print("---------")
+    # Open the image file given as the command line parameter
+    try:
+      loadIm=Image.open(sys.argv[1])
+    except:
+      if len(sys.argv)==0:
+        raise Exception("Please provide an image filename as a parameter.")
+      else:
+        raise Exception("Image file %s could not be loaded" % sys.argv[1])
+
+    # If the image height doesn't match the matrix, resize it
+    if loadIm.size[1] != MATRIX_HEIGHT:
+      origIm=loadIm.resize((loadIm.size[0]/(loadIm.size[1]//MATRIX_HEIGHT),MATRIX_HEIGHT),Image.BICUBIC)
+    else:
+      origIm=loadIm.copy()
+    # If the input is a very small portrait image, then no amount of resizing will save us
+    if origIm.size[0] < MATRIX_WIDTH:
+      raise Exception("Picture is too narrow. Must be at least %s pixels wide" % MATRIX_WIDTH)        
+
+    # Add a copy of the start of the image, to the end of the image,
+    # so that it loops smoothly at the end of the image
+    im=Image.new('RGB',(origIm.size[0]+MATRIX_WIDTH,MATRIX_HEIGHT))
+    im.paste(origIm,(0,0,origIm.size[0],MATRIX_HEIGHT))
+    im.paste(origIm.crop((0,0,MATRIX_WIDTH,MATRIX_HEIGHT)),(origIm.size[0],0,origIm.size[0]+MATRIX_WIDTH,MATRIX_HEIGHT))
+
 
 	# Create NeoPixel object with appropriate configuration.
 	strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
@@ -101,7 +166,7 @@ if __name__ == '__main__':
 	strip.begin()
 
 	colorWipe(strip, Color(32, 255, 0))  # Red wipe
-        exit(0)
+    exit(0)
 	print ('Press Ctrl-C to quit.')
 	while True:
 		print ('Color wipe animations.')
