@@ -17,6 +17,9 @@ def chunks(l, n):
     return [l[i:i+n] for i in range(0, len(l), n)]
 
 
+def colourTuple(rgbTuple):
+    return Color(rgbTuple[1],rgbTuple[0],rgbTuple[2])
+
 def get_screen():
   screen = [0] * 256
   a = 0
@@ -100,9 +103,9 @@ def text_to_screen(font, text, cols, lines):
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
-  """Wipe color across display a pixel at a time."""
-  for i in range(strip.numPixels()):
-    strip.setPixelColor(i, color)
+#  """Wipe color across display a pixel at a time."""
+  #for i in range(strip.numPixels()):
+    strip.setPixelColor(248, color)
     strip.show()
     time.sleep(wait_ms/1000.0)
 
@@ -164,7 +167,7 @@ MATRIX_HEIGHT=8
 # Main program logic follows:
 if __name__ == '__main__':
   # Process arguments
-  opt_parse()
+#  opt_parse()
 
   text = 'Scrolling ASCII text in console.'
 
@@ -182,7 +185,7 @@ if __name__ == '__main__':
   print(text_height)
   lines = int(text_height * 0.75)
 
-
+  print("---------")
   # Open the image file given as the command line parameter
   try:
     loadIm=Image.open(sys.argv[1])
@@ -213,8 +216,8 @@ if __name__ == '__main__':
   dots=list(im.getdata())
   # print("--------------------------")
   # print(rg)
-  # print(dots)
-
+  print(dots)
+  print(my_screen)
 
   # add some padding to the text
 #  padding = ' ' * int(cols / space_width + 1)
@@ -226,15 +229,21 @@ if __name__ == '__main__':
   strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
   # Intialize the library (must be called once before other functions).
   strip.begin()
-
+  print(my_screen[2][1])
+#  strip.setPixelColor(255,Color(255,0,0))
+  strip.show()
   print ('Press Ctrl-C to quit.')
   while True:
-    print ('hellworld.')
-    for x in range(MATRIX_WIDTH):
-      for y in range(MATRIX_HEIGHT):      
-        for i in range(len(dots)):
-           strip.setPixelColor(my_screen[x][y],colourTuple(dots[i]))
-    strip.show()
+  #  print ('hellworld.')
+
+    colorWipe(strip, Color(255, 0, 0))  # Red wipe
+    #colorWipe(strip, 248, Color(255,0,0))
+#    for x in range(MATRIX_WIDTH):
+#      for y in range(MATRIX_HEIGHT):      
+#        for i in range(len(dots)):
+#            print(x,y,dots[i])
+#            strip.setPixelColor(my_screen[x][y],colourTuple(dots[i]))
+  #  strip.show()
 
 
 #    text_to_screen(font, text, cols, lines)
