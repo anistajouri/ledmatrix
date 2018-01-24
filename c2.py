@@ -17,7 +17,7 @@ def chunks(l, n):
     return [l[i:i+n] for i in range(0, len(l), n)]
 
 
-def get_screen()
+def get_screen():
   screen = [0] * 256
   a = 0
   for x in xrange(0,256,16):
@@ -53,8 +53,8 @@ def opt_parse():
 
 # LED strip configuration:
 LED_COUNT      = 16      # Number of LED pixels.
-LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
-#LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
+#LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
+LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
@@ -75,7 +75,8 @@ def fill_rectangle(x1, y1, x2, y2, color):
           strip.setPixelColor(my_screen[x][y] , color)
     strip.show()
 
-
+def get_text_size(font,text):
+    return font.getsize(text)
 
 def text_to_screen(font, text, cols, lines):
     """Convert text to ASCII art text banner"""
@@ -84,14 +85,17 @@ def text_to_screen(font, text, cols, lines):
     draw.text((0, 0), text, fill='black', font=font)
     width, height = image.size
     pixels = image.load()
+#    print("w/h",width,height)
     for y in range(height):
         for x in range(width):
             pix = pixels[x, y]
             if pix != (255, 255, 255):
-                strip.setPixelColor(my_screen[x][y] , (255, 0, 0))
+                print("in:",x,y)
+                strip.setPixelColor(my_screen[x][y] , Color(255, 0, 0))
                 strip.show()
             else:
-                strip.setPixelColor(my_screen[x][y] , (0, 0, 255))
+                strip.setPixelColor(my_screen[x][y] , Color(0, 0, 255))
+                print("ou:",x,y)
                 strip.show()
 
 # Define functions which animate LEDs in various ways.
@@ -153,10 +157,9 @@ def theaterChaseRainbow(strip, wait_ms=50):
 
 # Main program logic follows:
 if __name__ == '__main__':
-        # Process arguments
-        opt_parse()
+  # Process arguments
+  opt_parse()
 
-  """Main"""
   text = 'Scrolling ASCII text in console.'
 
   font = ImageFont.load_default()
@@ -171,22 +174,24 @@ if __name__ == '__main__':
   # resize console
   cols = 32
   print(text_height)
-  lines = int(text_height * 1.25)
+  lines = int(text_height * 0.75)
 
 
   # add some padding to the text
-  padding = ' ' * int(cols / space_width + 1)
-  text = padding + text
+#  padding = ' ' * int(cols / space_width + 1)
+#  text = padding + text
 
   # Create NeoPixel object with appropriate configuration.
-  strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
+  #strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
+ 
+  strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
   # Intialize the library (must be called once before other functions).
   strip.begin()
 
   print ('Press Ctrl-C to quit.')
   while True:
     print ('matrix scrolling.')
-    text_to_screen(font, text[index:], cols, lines)
+    text_to_screen(font, text, cols, lines)
     # colorWipe(strip, Color(255, 0, 0))  # Red wipe
     # colorWipe(strip, Color(0, 255, 0))  # Blue wipe
     # colorWipe(strip, Color(0, 0, 255))  # Green wipe
